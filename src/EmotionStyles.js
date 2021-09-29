@@ -7,7 +7,7 @@ export const AppStyle = styled.div`
   flex-direction: column;
   align-items: stretch;
   justify-content: stretch;
-  color: #a9a9a9;
+  color: #666666;
   font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 `;
 
@@ -42,7 +42,7 @@ export const HeaderOne = styled.h1`
 export const Button = styled.button`
   margin: 0 12px 0 0;
   padding: 12px;
-  background-color: #ff3b3f;
+  background-color: #990099;
   font-size: 16px;
   border-radius: 4px;
   border: 0px;
@@ -55,7 +55,6 @@ export const Button = styled.button`
 `;
 
 export const Label = styled.label`
-  color: black;
   text-transform: uppercase;
   text-align: left;
   font-weight: bolder;
@@ -71,6 +70,7 @@ export const Input = styled.input`
   background-color: white;
   font-size: 16px;
   font-family: inherit;
+  color: #333333;
 `;
 
 export const InputWrapper = styled.div`
@@ -113,7 +113,7 @@ export const DropdownOption = styled.button`
   font-size: 12px;
   border: 0px;
   color: black;
-  background-color: lightgrey;
+  background-color: #dddddd;
   font-family: inherit;
   text-align: left;
   &:hover {
@@ -141,7 +141,7 @@ export const PreviewWrapper = styled.div`
   margin: 8px 0 24px 0;
   height: 200px;
   width: 316px;
-  background-color: #a9a9a9;
+  background-color: #dddddd;
 `;
 
 export const PreviewImage = styled.img`

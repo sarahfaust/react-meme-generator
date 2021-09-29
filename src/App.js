@@ -28,40 +28,36 @@ function App() {
   const [memeIsSelected, setMemeIsSelected] = useState(false);
   const [meme, setMeme] = useState('');
 
-  function getMeme(id) {
-    if (imageName && topText && bottomText) {
+  // I was passing only id to getMeme() and tried to get imageName from state,
+  // but this was not working for the first name I selected, it was always an empty string
+  // now I'm getting the name directly from the suggestion and it works.
+  // Would be interesting to know why this empty string is happening and all further ones are ok.
+
+  function getMeme(id, name) {
+    // console.log(name);
+    if (name && topText && bottomText) {
       setMeme(
         `https://api.memegen.link/images/${id}/${topText}%2F${bottomText}.png`,
       );
       setImagePreviewIsSelected(false);
       setMemeIsSelected(true);
-    } else if (imageName) {
+    } else if (name) {
+      // console.log(name);
       setImagePreview(`https://api.memegen.link/images/${id}.png`);
       setMemeIsSelected(false);
       setImagePreviewIsSelected(true);
     } else {
-      console.log(id);
-      console.log(JSON.stringify(image));
-      alert(
-        'Sorry, something went wrong. Please try again or call moral support.',
-      );
+      // console.log(name);
+      alert('Please choose an image and two lines of meme text.');
     }
   }
 
   function suggestionSelected(suggestion) {
-    console.log(JSON.stringify(suggestion));
+    // console.log(JSON.stringify(suggestion));
     setImage(suggestion);
     setImageName(suggestion.name);
     setSuggestions([]);
-    getMeme(suggestion.id);
-  }
-
-  function generateMeme() {
-    if (image.id && topText && bottomText) {
-      getMeme(image.id);
-    } else {
-      alert('Please choose image, top and bottom text!');
-    }
+    getMeme(suggestion.id, suggestion.name);
   }
 
   return (
@@ -99,7 +95,14 @@ function App() {
               </PreviewWrapper>
             )}
             <div>
-              <Button onClick={generateMeme}>Generate</Button>
+              <Button
+                onClick={(event) => {
+                  event.preventDefault();
+                  getMeme(image.id, image.name);
+                }}
+              >
+                Generate
+              </Button>
               <Button>Download</Button>
             </div>
           </Form>
