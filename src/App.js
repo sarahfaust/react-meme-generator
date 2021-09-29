@@ -1,12 +1,19 @@
 import './App.css';
 import { useState } from 'react';
 import {
+  AppStyle,
   Button,
   Form,
+  HeaderOne,
   Image,
   ImageWrapper,
   Input,
+  InputWrapper,
   Label,
+  Main,
+  PreviewImage,
+  PreviewWrapper,
+  Section,
 } from './EmotionStyles';
 import { Suggestions } from './Suggestions';
 
@@ -14,68 +21,98 @@ function App() {
   const [topText, setTopText] = useState('');
   const [bottomText, setBottomText] = useState('');
   const [imageName, setImageName] = useState('');
+  const [image, setImage] = useState({});
   const [suggestions, setSuggestions] = useState([]);
-  const [imageIsSelected, setImageIsSelected] = useState(false);
-  const [templateLink, setTemplateLink] = useState('');
-  const [memeLink, setMemeLink] = useState('');
+  const [imagePreviewIsSelected, setImagePreviewIsSelected] = useState(false);
+  const [imagePreview, setImagePreview] = useState('');
+  const [memeIsSelected, setMemeIsSelected] = useState(false);
+  const [meme, setMeme] = useState('');
 
-  /*   async function getImage(imageToFetch) {
-    try {
-      fetch(`https://api.memegen.link/images/${image.id}.png`);
-      setImage();
-    } catch (error) {
-      console.log(error);
+  function getMeme(id) {
+    if (imageName && topText && bottomText) {
+      setMeme(
+        `https://api.memegen.link/images/${id}/${topText}%2F${bottomText}.png`,
+      );
+      setImagePreviewIsSelected(false);
+      setMemeIsSelected(true);
+    } else if (imageName) {
+      setImagePreview(`https://api.memegen.link/images/${id}.png`);
+      setMemeIsSelected(false);
+      setImagePreviewIsSelected(true);
+    } else {
+      console.log(id);
+      console.log(JSON.stringify(image));
+      alert(
+        'Sorry, something went wrong. Please try again or call moral support.',
+      );
     }
-  } */
+  }
 
-  function suggestionSelected(selectedImage) {
-    setImageName(selectedImage.name);
+  function suggestionSelected(suggestion) {
+    console.log(JSON.stringify(suggestion));
+    setImage(suggestion);
+    setImageName(suggestion.name);
     setSuggestions([]);
-    setImageIsSelected(true);
-    setTemplateLink(`https://api.memegen.link/images/${selectedImage.id}.png`);
-    setMemeLink(
-      `https://api.memegen.link/images/${selectedImage.id}/${topText}%2F${bottomText}.png`,
-    );
+    getMeme(suggestion.id);
+  }
+
+  function generateMeme() {
+    if (image.id && topText && bottomText) {
+      getMeme(image.id);
+    } else {
+      alert('Please choose image, top and bottom text!');
+    }
   }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Meme Generator</h1>
-        <Form>
-          <Label htmlFor="top-text-meme">Top text</Label>
-          <Input
-            id="top-text-meme"
-            value={topText}
-            onChange={(event) => setTopText(event.currentTarget.value)}
-          />
-          <Suggestions
-            imageName={imageName}
-            setImageName={setImageName}
-            suggestions={suggestions}
-            setSuggestions={setSuggestions}
-            suggestionSelected={suggestionSelected}
-          />
-          {imageIsSelected && topText === '' && bottomText === '' && (
+    <AppStyle>
+      <HeaderOne>Meme Generator</HeaderOne>
+      <Main>
+        <Section>
+          <Form>
+            <InputWrapper>
+              <Label htmlFor="top-text-meme">Top text</Label>
+              <Input
+                id="top-text-meme"
+                value={topText}
+                onChange={(event) => setTopText(event.currentTarget.value)}
+              />
+            </InputWrapper>
+            <InputWrapper>
+              <Label htmlFor="bottom-text-meme">Bottom text</Label>
+              <Input
+                id="bottom-text-type-meme"
+                value={bottomText}
+                onChange={(event) => setBottomText(event.currentTarget.value)}
+              />
+            </InputWrapper>
+            <Suggestions
+              imageName={imageName}
+              setImageName={setImageName}
+              suggestions={suggestions}
+              setSuggestions={setSuggestions}
+              suggestionSelected={suggestionSelected}
+            />
+            {imagePreviewIsSelected && (
+              <PreviewWrapper>
+                <PreviewImage src={imagePreview} alt={imageName} />
+              </PreviewWrapper>
+            )}
+            <div>
+              <Button onClick={generateMeme}>Generate</Button>
+              <Button>Download</Button>
+            </div>
+          </Form>
+        </Section>
+        <Section>
+          {memeIsSelected && (
             <ImageWrapper>
-              <Image src={templateLink} alt={imageName} />
+              <Image src={meme} alt={imageName} />
             </ImageWrapper>
           )}
-          {imageIsSelected && topText && bottomText && (
-            <ImageWrapper>
-              <Image src={memeLink} alt={imageName} />
-            </ImageWrapper>
-          )}
-          <Label htmlFor="bottom-text-meme">Bottom text</Label>
-          <Input
-            id="bottom-text-type-meme"
-            value={bottomText}
-            onChange={(event) => setBottomText(event.currentTarget.value)}
-          />
-        </Form>
-        <Button>Download</Button>
-      </header>
-    </div>
+        </Section>
+      </Main>
+    </AppStyle>
   );
 }
 
