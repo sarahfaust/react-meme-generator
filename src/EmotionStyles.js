@@ -21,7 +21,7 @@ export const Main = styled.div`
 export const Section = styled.div`
   display: flex;
   flex-direction: column;
-  width: 50vw;
+  width: ${(props) => props.width};
   padding: 2rem;
 `;
 
@@ -37,6 +37,12 @@ export const HeaderOne = styled.h1`
   text-align: left;
   font-size: 32px;
   font-weight: bold;
+`;
+
+export const ButtontWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 24px;
 `;
 
 export const Button = styled.button`
@@ -62,21 +68,21 @@ export const Label = styled.label`
   margin-bottom: 12px;
 `;
 
+export const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+`;
+
 export const Input = styled.input`
   padding: 8px;
-  width: 300px;
+  width: 320px;
   border: 1px solid transparent;
   border-radius: 2px;
   background-color: white;
   font-size: 16px;
   font-family: inherit;
   color: #333333;
-`;
-
-export const InputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 24px;
 `;
 
 export const DropdownPosition = styled.div`
@@ -90,7 +96,7 @@ export const Dropdown = styled.ul`
   margin: 0;
   padding: 0;
   max-height: 200px;
-  width: 316px;
+  width: 336px;
   background-color: white;
   overflow-y: scroll;
   position: absolute;
@@ -140,11 +146,33 @@ export const PreviewWrapper = styled.div`
   justify-content: center;
   margin: 8px 0 24px 0;
   height: 200px;
-  width: 316px;
+  width: 336px;
   background-color: #dddddd;
 `;
 
 export const PreviewImage = styled.img`
-  max-width: 316px;
+  max-width: 336px;
   max-height: 200px;
+`;
+
+export const HistoryItem = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 4px 0;
+`;
+
+export const HistoryImageWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #dddddd;
+  margin-right: 12px;
+  width: 50px;
+  height: 50px;
+`;
+
+export const HistoryImage = styled.img`
+  max-width: 50px;
+  max-height: 50px;
 `;
