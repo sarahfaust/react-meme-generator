@@ -39,7 +39,7 @@ export const HeaderOne = styled.h1`
   font-weight: bold;
 `;
 
-export const ButtontWrapper = styled.div`
+export const ButtonWrapper = styled.div`
   display: flex;
   flex-direction: row;
   margin-bottom: 24px;
@@ -160,6 +160,7 @@ export const HistoryItem = styled.div`
   flex-direction: row;
   align-items: center;
   margin: 4px 0;
+  font-size: 12px;
 `;
 
 export const HistoryImageWrapper = styled.div`

@@ -1,10 +1,9 @@
 import './App.css';
-import { css } from '@emotion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   AppStyle,
   Button,
-  ButtontWrapper,
+  ButtonWrapper,
   Form,
   HeaderOne,
   HistoryImage,
@@ -23,49 +22,103 @@ import {
 import { Suggestions } from './Suggestions';
 
 function App() {
+  const baseURL = 'https://api.memegen.link/images/';
   const [topText, setTopText] = useState('');
   const [bottomText, setBottomText] = useState('');
   const [imageName, setImageName] = useState('');
   const [image, setImage] = useState({});
   const [suggestions, setSuggestions] = useState([]);
-  const [imagePreviewIsSelected, setImagePreviewIsSelected] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
+  const [imagePreviewIsSelected, setImagePreviewIsSelected] = useState(false);
   const [currentMeme, setCurrentMeme] = useState('');
   const [memeIsSelected, setMemeIsSelected] = useState(false);
   const [history, setHistory] = useState([]);
   const [historyIsSelected, setHistoryIsSelected] = useState(false);
 
-  // I was passing only id to getMeme() and tried to get imageName from state,
-  // but this was not working for the first name I selected, it was always an empty string
-  // now I'm getting the name directly from the suggestion and it works.
-  // Would be interesting to know why this empty string is happening and all further ones are ok.
+  function modifyTextString(text) {
+    const modifiedText = text
+      .replaceAll('?', '~q')
+      .replaceAll('&', '~a')
+      .replaceAll('%', '~p')
+      .replaceAll('#', '~h')
+      .replaceAll('/', '~s')
+      .replaceAll('\\', '~b')
+      .replaceAll('<', '~l')
+      .replaceAll('>', '~g')
+      .replaceAll('"', "''")
+      .replaceAll('_', '__')
+      .replaceAll('  ', '_')
+      .replaceAll(' ', '_')
+      .replaceAll('-', '--');
+    return modifiedText;
+  }
 
-  function getMeme(meme) {
-    // console.log(name);
-    if (meme.name && topText && bottomText) {
-      meme.customLink = `https://api.memegen.link/images/${meme.id}/${topText}%2F${bottomText}.png`;
-      const newHistory = [...history, meme];
-      setHistory(newHistory);
+  // I was passing only id to getMeme() and tried to get imageName from state,
+  // but this was not working for the first name I selected, it was always an empty string.
+  // Now I'm getting the name directly from the suggestion and it works.
+  // Would be interesting to know why this one empty string is happening and all further ones are ok.
+
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('history');
+    setHistory(JSON.parse(savedHistory) || []);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('history', JSON.stringify(history));
+  }, [history]);
+
+  function generateMeme() {
+    if (topText && bottomText) {
+      const modTopText = modifyTextString(topText);
+      const modBottomText = modifyTextString(bottomText);
+      const customLink = `${baseURL}${image.id}/${modTopText}%2F${modBottomText}.png`;
+      const meme = {
+        ...image,
+        topText: topText,
+        bottomText: bottomText,
+        customLink: customLink,
+      };
+      const isInHistory = history.some(
+        (entry) => customLink === entry.customLink,
+      );
+      let newHistory;
+      if (!isInHistory) {
+        newHistory = [...history, meme];
+        setHistory(newHistory);
+      }
       setCurrentMeme(meme);
       setImagePreviewIsSelected(false);
       setMemeIsSelected(true);
-    } else if (meme.name) {
-      // console.log(name);
-      setImagePreview(`https://api.memegen.link/images/${meme.id}.png`);
-      setMemeIsSelected(false);
-      setImagePreviewIsSelected(true);
     } else {
-      // console.log(name);
       alert('Please choose an image and two lines of meme text.');
     }
   }
 
+  function generatePreview(preview) {
+    setImagePreview(`${baseURL}${preview.id}.png`);
+    setMemeIsSelected(false);
+    setImagePreviewIsSelected(true);
+  }
+
+  async function downloadMeme() {
+    const response = await fetch(currentMeme.customLink);
+    const imageBlob = await response.blob();
+    const imageURL = URL.createObjectURL(imageBlob);
+
+    const link = document.createElement('a');
+    link.href = imageURL;
+
+    link.download = currentMeme.customLink;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   function suggestionSelected(suggestion) {
-    // console.log(JSON.stringify(suggestion));
     setImage(suggestion);
     setImageName(suggestion.name);
     setSuggestions([]);
-    getMeme(suggestion);
+    generatePreview(suggestion);
   }
 
   return (
@@ -102,16 +155,23 @@ function App() {
                 <PreviewImage src={imagePreview} alt={imageName} />
               </PreviewWrapper>
             )}
-            <ButtontWrapper>
+            <ButtonWrapper>
               <Button
                 onClick={(event) => {
                   event.preventDefault();
-                  getMeme(image);
+                  generateMeme();
                 }}
               >
                 Generate
               </Button>
-              <Button>Download</Button>
+              <Button
+                onClick={(event) => {
+                  event.preventDefault();
+                  downloadMeme();
+                }}
+              >
+                Download
+              </Button>
               <Button
                 onClick={(event) => {
                   event.preventDefault();
@@ -120,13 +180,15 @@ function App() {
               >
                 History
               </Button>
-            </ButtontWrapper>
+            </ButtonWrapper>
           </Form>
           {historyIsSelected && (
             <InputWrapper>
               <h3>History</h3>
               {history.map((item) => (
-                <HistoryItem key={item.id}>
+                <HistoryItem
+                  key={`${item.id}_${item.topText}_${item.bottomText}`}
+                >
                   <HistoryImageWrapper>
                     <HistoryImage src={item.customLink} />
                   </HistoryImageWrapper>
